@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><title>Stok Opname</title>
+  <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f766e">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{--bg:#f4f6f8;--card:#fff;--tx:#12171d;--mut:#667085;--bd:#e1e5ea;--pri:#0f766e;--pt:#fff;--bad:#c0392b;--ok:#15803d;--wn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -136,4 +137,5 @@ XLSX.utils.book_append_sheet(wb,sheet(r),"Template");out("template-stok-opname.x
 arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats();renderList(true);toast("Hasil hitung direset")});
 arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();cur=null;flush();stats();renderList(true);showCur();toast("Semua data dihapus")});
 load();stats();
+  if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
