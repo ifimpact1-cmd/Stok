@@ -138,5 +138,18 @@ XLSX.utils.book_append_sheet(wb,sheet(r),"Template");out("template-stok-opname.x
 arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats();renderList(true);toast("Hasil hitung direset")});
 arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();cur=null;flush();stats();renderList(true);showCur();toast("Semua data dihapus")});
 load();stats();
+  $("#man").placeholder="Cari nama barang / scan / ketik barcode";
+function autoCode(){let n=0;try{n=+localStorage.getItem("nbc")||0}catch(e){}let c;do{n++;c="NB"+String(n).padStart(4,"0")}while(idx.has(c));try{localStorage.setItem("nbc",n)}catch(e){}return c}
+function pilih(i){cur=i;$("#man").value="";$("#sg").innerHTML="";showCur()}
+function sugg(){const v=$("#man").value.trim(),q=v.toLowerCase(),s=$("#sg");if(!q){s.innerHTML="";return}let h="",n=0;
+for(const i of items){if((i.n+" "+i.b+" "+i.k).toLowerCase().includes(q)){h+='<div class="it" data-b="'+esc(i.b)+'"><div><div class="t">'+esc(i.n)+'</div><div class="m">'+esc(i.b)+' · '+(esc(i.k)||"-")+'</div></div><div><div>'+(i.f??"-")+' / '+i.q+' '+esc(i.s)+'</div></div></div>';if(++n>=8)break}}
+h+='<button class="b s" id="sa" style="margin-top:8px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
+$("#man").oninput=sugg;
+$("#sg").onclick=e=>{const r=e.target.closest(".it");if(r){pilih(idx.get(r.dataset.b));return}
+if(e.target.closest("#sa")){const t=$("#man").value.trim();$("#man").value="";$("#sg").innerHTML="";showNew(autoCode());const nn=$("#nn");if(nn){nn.value=t;$("#nq").focus()}}};
+$("#man").onkeydown=e=>{if(e.key!=="Enter")return;const v=e.target.value.trim();if(!v)return;
+if(idx.has(v)){e.target.value="";$("#sg").innerHTML="";onCode(v);return}
+const m=items.filter(i=>(i.n+" "+i.b+" "+i.k).toLowerCase().includes(v.toLowerCase()));
+if(m.length===1)pilih(m[0]);else toast(m.length?"Pilih dari daftar di bawah":"Tidak ada. Tap + Tambah barang baru")};
   if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
