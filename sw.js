@@ -1,4 +1,4 @@
-const V="stok-v1";
+const V="stok-v3";
 const CORE=["./","./index.html","./manifest.json","https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"];
 self.addEventListener("install",e=>{
   e.waitUntil(caches.open(V).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()));
