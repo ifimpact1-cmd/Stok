@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><title>Stok Opname</title>
-  <link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f766e">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
 :root{--bg:#f4f6f8;--card:#fff;--tx:#12171d;--mut:#667085;--bd:#e1e5ea;--pri:#0f766e;--pt:#fff;--bad:#c0392b;--ok:#15803d;--wn:#b45309;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -35,18 +35,18 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 <div class="c">
 <video id="v" playsinline muted></video><div id="reader"></div>
 <div class="r"><button class="b" id="cam">Buka Kamera</button><select id="mode"><option value="p">Tiap scan +1</option><option value="m">Isi jumlah manual</option></select></div>
-<div class="r"><input id="man" placeholder="Ketik / scanner USB: barcode lalu Enter" inputmode="text" autocomplete="off"></div>
-  <div id="sg"></div>
+<div class="r"><input id="man" placeholder="Cari nama barang / scan / ketik barcode" autocomplete="off"></div>
+<div id="sg"></div>
 </div>
 <div id="cur"></div>
 </section>
 <section id="list">
-<div class="c"><input id="q" type="search" placeholder="Cari nama / barcode / kategori">
+<div class="c"><input id="q" type="search" placeholder="Cari nama / barcode / kategori / brand">
 <div class="r"><select id="f"><option value="a">Semua</option><option value="n">Belum dihitung</option><option value="d">Ada selisih</option><option value="o">Sesuai</option></select></div></div>
 <div class="c" id="rows"></div><button class="b s" id="more" style="display:none">Tampilkan lebih banyak</button>
 </section>
 <section id="data">
-<div class="c"><h3>Impor Excel / CSV</h3><div class="m">Kolom: barcode, nama barang, qty, satuan, kategori (opsional: qty fisik). Format kolom barcode sebagai Teks.</div>
+<div class="c"><h3>Impor Excel / CSV</h3><div class="m">Kolom: barcode, nama barang, qty, satuan, kategori, brand (opsional: qty fisik). Format kolom barcode sebagai Teks.</div>
 <div class="r"><select id="imode"><option value="g">Gabung (update)</option><option value="r">Ganti semua data</option></select></div>
 <div class="r"><input type="file" id="file" accept=".xlsx,.xls,.csv"></div></div>
 <div class="c"><h3>Ekspor</h3><div class="r"><button class="b" id="ex">Excel (.xlsx)</button><button class="b s" id="ec">CSV</button></div>
@@ -58,7 +58,8 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 <li>Dasar koreksi stok dan laporan keuangan (nilai persediaan, audit).</li>
 <li>Mencegah kehabisan stok dan menekan kerugian.</li></ul>
 <h3 style="margin-top:10px">Cara pakai</h3><ul>
-<li>Impor data stok sistem, lalu scan barang satu per satu.</li>
+<li>Impor data stok sistem, lalu scan barang atau cari nama barang.</li>
+<li>Barang tidak ada di data? Tap "+ Tambah barang baru", isi nama, kategori, dan brand.</li>
 <li>Selisih = qty fisik - qty sistem. Ekspor hasilnya untuk laporan/audit.</li>
 <li>Data tersimpan di HP ini (offline). Ekspor berkala sebagai cadangan.</li></ul></div>
 </section>
@@ -68,6 +69,8 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 const $=s=>document.querySelector(s),KEY="stokopname_v1";
 let items=[],idx=new Map(),cur=null,stream=null,det=null,tm=null,h5=null,last="",lt=0,lim=50,sv=null,ac=null;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sub=i=>(esc(i.k)||"-")+(i.r?" · "+esc(i.r):"");
+const hay=i=>(i.n+" "+i.b+" "+(i.k||"")+" "+(i.r||"")).toLowerCase();
 function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove("on"),1800)}
 function load(){try{items=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){items=[]}idx=new Map(items.map(i=>[i.b,i]))}
 function save(){clearTimeout(sv);sv=setTimeout(flush,400)}
@@ -81,7 +84,7 @@ const it=idx.get(code);beep();
 if(it){cur=it;if($("#mode").value==="p"){it.f=(it.f||0)+1;save();stats()}showCur()}else showNew(code)}
 function diffHtml(i){if(i.f==null)return'<span class="zr">belum dihitung</span>';const d=i.f-i.q;return`<span class="${d?(d>0?"pos":"neg"):"zr"}">Selisih ${d>0?"+":""}${d}</span>`}
 function showCur(){const i=cur;if(!i){$("#cur").innerHTML="";return}
-$("#cur").innerHTML=`<div class="c"><div class="nm">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${esc(i.k)||"-"}</div>
+$("#cur").innerHTML=`<div class="c"><div class="nm">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${sub(i)}</div>
 <div class="m" style="margin-top:6px">Stok sistem: <b>${i.q}</b> ${esc(i.s)} · <span id="df">${diffHtml(i)}</span></div>
 <div class="big"><button id="mn">−</button><input id="fq" type="number" inputmode="numeric" value="${i.f??""}" placeholder="0"><button id="pl">+</button></div>
 <button class="b d" id="rm">Hapus barang ini</button></div>`;
@@ -90,15 +93,28 @@ $("#mn").onclick=()=>set(Math.max(0,(i.f||0)-1));$("#pl").onclick=()=>set((i.f||
 $("#fq").onchange=e=>{const v=e.target.value;set(v===""?null:Math.max(0,+v))};
 arm($("#rm"),"Hapus barang ini",()=>{items=items.filter(x=>x!==i);idx.delete(i.b);cur=null;save();stats();showCur();toast("Dihapus")});
 if($("#mode").value==="m")$("#fq").focus()}
-function showNew(code){cur=null;$("#cur").innerHTML=`<div class="c"><div class="nm">Barang baru</div><div class="m">${esc(code)} tidak ada di data.</div>
-<div style="margin-top:8px"><label>Nama barang</label><input id="nn"></div>
+const uniq=f=>[...new Set(items.map(i=>i[f]).filter(Boolean))].sort().slice(0,300).map(v=>'<option value="'+esc(v)+'">').join("");
+function autoCode(){let n=0;try{n=+localStorage.getItem("nbc")||0}catch(e){}let c;do{n++;c="NB"+String(n).padStart(4,"0")}while(idx.has(c));try{localStorage.setItem("nbc",n)}catch(e){}return c}
+function showNew(code,name){cur=null;$("#cur").innerHTML=`<div class="c"><div class="nm">Barang baru</div><div class="m">Kode: ${esc(code)}</div>
+<div style="margin-top:8px"><label>Nama barang</label><input id="nn" value="${esc(name||"")}"></div>
 <div class="r"><div><label>Qty fisik</label><input id="nq" type="number" inputmode="numeric" value="1"></div><div><label>Satuan</label><input id="ns" value="pcs"></div></div>
-<div style="margin-top:8px"><label>Kategori</label><input id="nk"></div>
+<div class="r"><div><label>Kategori</label><input id="nk" list="dk" autocomplete="off"><datalist id="dk">${uniq("k")}</datalist></div><div><label>Brand</label><input id="nr" list="dr" autocomplete="off"><datalist id="dr">${uniq("r")}</datalist></div></div>
 <div class="r"><button class="b" id="na">Tambah</button><button class="b s" id="nc">Batal</button></div></div>`;
 $("#nc").onclick=()=>{$("#cur").innerHTML=""};
-$("#na").onclick=()=>{const n=$("#nn").value.trim();if(!n)return toast("Isi nama barang");const i={b:code,n,q:0,s:$("#ns").value.trim(),k:$("#nk").value.trim(),f:Math.max(0,+$("#nq").value||0)};items.push(i);idx.set(code,i);cur=i;save();stats();showCur();toast("Ditambahkan")}}
+$("#na").onclick=()=>{const n=$("#nn").value.trim();if(!n)return toast("Isi nama barang");const i={b:code,n,q:0,s:$("#ns").value.trim(),k:$("#nk").value.trim(),r:$("#nr").value.trim(),f:Math.max(0,+$("#nq").value||0)};items.push(i);idx.set(code,i);cur=i;save();stats();showCur();toast("Ditambahkan")};
+setTimeout(()=>{const e=$(name?"#nq":"#nn");e&&e.focus()},50)}
 function arm(b,txt,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);b.dataset.a="";b.textContent=txt;fn()}else{b.dataset.a="1";b.textContent="Yakin? Tap lagi";t=setTimeout(()=>{b.dataset.a="";b.textContent=txt},3000)}}}
-$("#man").onkeydown=e=>{if(e.key==="Enter"){onCode(e.target.value);e.target.value=""}};
+function pilih(i){cur=i;$("#man").value="";$("#sg").innerHTML="";showCur()}
+function sugg(){const v=$("#man").value.trim(),q=v.toLowerCase(),s=$("#sg");if(!q){s.innerHTML="";return}let h="",n=0;
+for(const i of items){if(hay(i).includes(q)){h+='<div class="it" data-b="'+esc(i.b)+'"><div><div class="t">'+esc(i.n)+'</div><div class="m">'+esc(i.b)+' · '+sub(i)+'</div></div><div><div>'+(i.f??"-")+' / '+i.q+' '+esc(i.s)+'</div></div></div>';if(++n>=8)break}}
+h+='<button class="b s" id="sa" style="margin-top:8px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
+$("#man").oninput=sugg;
+$("#sg").onclick=e=>{const r=e.target.closest(".it");if(r){pilih(idx.get(r.dataset.b));return}
+if(e.target.closest("#sa")){const t=$("#man").value.trim();$("#man").value="";$("#sg").innerHTML="";showNew(autoCode(),t)}};
+$("#man").onkeydown=e=>{if(e.key!=="Enter")return;const v=e.target.value.trim();if(!v)return;
+if(idx.has(v)){e.target.value="";$("#sg").innerHTML="";onCode(v);return}
+const m=items.filter(i=>hay(i).includes(v.toLowerCase()));
+if(m.length===1)pilih(m[0]);else toast(m.length?"Pilih dari daftar di bawah":"Tidak ada. Tap + Tambah barang baru")};
 async function startCam(){
 if(stream||h5)return stopCam();
 try{if("BarcodeDetector"in window)det=new BarcodeDetector();}catch(e){det=null}
@@ -112,44 +128,31 @@ function stopCam(){clearInterval(tm);if(stream){stream.getTracks().forEach(t=>t.
 $("#cam").onclick=startCam;
 function renderList(reset){if(reset)lim=50;const q=$("#q").value.toLowerCase().trim(),f=$("#f").value;let n=0,h="",more=false;
 for(const i of items){if(f==="n"&&i.f!=null)continue;if(f==="d"&&(i.f==null||i.f===i.q))continue;if(f==="o"&&(i.f==null||i.f!==i.q))continue;
-if(q&&!(i.b.toLowerCase().includes(q)||i.n.toLowerCase().includes(q)||i.k.toLowerCase().includes(q)))continue;
+if(q&&!hay(i).includes(q))continue;
 if(n>=lim){more=true;break}n++;
-h+=`<div class="it" data-b="${esc(i.b)}"><div><div class="t">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${esc(i.k)||"-"}</div></div><div><div>${i.f??"-"} / ${i.q} ${esc(i.s)}</div><div class="m">${diffHtml(i)}</div></div></div>`}
+h+=`<div class="it" data-b="${esc(i.b)}"><div><div class="t">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${sub(i)}</div></div><div><div>${i.f??"-"} / ${i.q} ${esc(i.s)}</div><div class="m">${diffHtml(i)}</div></div></div>`}
 $("#rows").innerHTML=h||'<div class="m">Tidak ada data. Impor file di tab Data.</div>';$("#more").style.display=more?"block":"none"}
 $("#q").oninput=()=>renderList(true);$("#f").onchange=()=>renderList(true);$("#more").onclick=()=>{lim+=100;renderList()};
 $("#rows").onclick=e=>{const r=e.target.closest(".it");if(!r)return;cur=idx.get(r.dataset.b);document.querySelector('nav [data-t="scan"]').click();showCur();window.scrollTo(0,0)};
 const N=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,""),
-K={b:["barcode","kode","kodebarang","sku","kodebarcode"],n:["namabarang","nama","barang","produk","item"],q:["qty","stok","stock","jumlah","qtysistem"],s:["satuan","unit","uom"],k:["kategori","category","grup"],f:["qtyfisik","fisik","hasilhitung","counted"]};
+K={b:["barcode","kode","kodebarang","sku","kodebarcode"],n:["namabarang","nama","barang","produk","item"],q:["qty","stok","stock","jumlah","qtysistem"],s:["satuan","unit","uom"],k:["kategori","category","grup"],r:["brand","merk","merek"],f:["qtyfisik","fisik","hasilhitung","counted"]};
 function pick(row,key){for(const c in row){if(K[key].includes(N(c)))return row[c]}return ""}
 $("#file").onchange=async e=>{const fl=e.target.files[0];if(!fl)return;
 try{const wb=XLSX.read(await fl.arrayBuffer(),{type:"array",raw:true}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
 const rep=$("#imode").value==="r";if(rep){items=[];idx=new Map()}let add=0,upd=0;
-for(const r of rows){const b=String(pick(r,"b")).trim();if(!b)continue;const fv=pick(r,"f"),o={b,n:String(pick(r,"n")).trim()||b,q:+pick(r,"q")||0,s:String(pick(r,"s")).trim(),k:String(pick(r,"k")).trim(),f:fv===""?null:+fv||0},x=idx.get(b);
-if(x){Object.assign(x,{n:o.n,q:o.q,s:o.s,k:o.k});if(o.f!=null)x.f=o.f;upd++}else{items.push(o);idx.set(b,o);add++}}
+for(const r of rows){const b=String(pick(r,"b")).trim();if(!b)continue;const fv=pick(r,"f"),o={b,n:String(pick(r,"n")).trim()||b,q:+pick(r,"q")||0,s:String(pick(r,"s")).trim(),k:String(pick(r,"k")).trim(),r:String(pick(r,"r")).trim(),f:fv===""?null:+fv||0},x=idx.get(b);
+if(x){Object.assign(x,{n:o.n,q:o.q,s:o.s,k:o.k});if(o.r)x.r=o.r;if(o.f!=null)x.f=o.f;upd++}else{items.push(o);idx.set(b,o);add++}}
 flush();stats();renderList(true);toast(`Impor selesai: ${add} baru, ${upd} diupdate`)}catch(err){toast("File tidak bisa dibaca")}e.target.value=""};
 function out(name,data){try{const b=new Blob([data],{type:"application/octet-stream"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("Mengunduh "+name)}catch(e){toast("Gagal menyimpan")}}
-function sheet(rows){return XLSX.utils.json_to_sheet(rows,{header:["barcode","nama barang","qty","satuan","kategori","qty fisik","selisih"]})}
-function exRows(){return items.map(i=>({"barcode":i.b,"nama barang":i.n,"qty":i.q,"satuan":i.s,"kategori":i.k,"qty fisik":i.f==null?"":i.f,"selisih":i.f==null?"":i.f-i.q}))}
+function sheet(rows){return XLSX.utils.json_to_sheet(rows,{header:["barcode","nama barang","qty","satuan","kategori","brand","qty fisik","selisih"]})}
+function exRows(){return items.map(i=>({"barcode":i.b,"nama barang":i.n,"qty":i.q,"satuan":i.s,"kategori":i.k,"brand":i.r||"","qty fisik":i.f==null?"":i.f,"selisih":i.f==null?"":i.f-i.q}))}
 const stamp=()=>new Date().toISOString().slice(0,10);
 $("#ex").onclick=()=>{if(!items.length)return toast("Belum ada data");const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,sheet(exRows()),"Stok Opname");out(`stok-opname-${stamp()}.xlsx`,new Uint8Array(XLSX.write(wb,{bookType:"xlsx",type:"array"})))};
 $("#ec").onclick=()=>{if(!items.length)return toast("Belum ada data");out(`stok-opname-${stamp()}.csv`,"\ufeff"+XLSX.utils.sheet_to_csv(sheet(exRows())))};
-$("#tp").onclick=()=>{const wb=XLSX.utils.book_new(),r=[{barcode:"8999999000011",qty:24,satuan:"pcs",kategori:"Minuman"},{barcode:"8999999000028",qty:10,satuan:"box",kategori:"Makanan"}].map((x,i)=>({"barcode":x.barcode,"nama barang":["Air Mineral 600ml","Biskuit Coklat"][i],"qty":x.qty,"satuan":x.satuan,"kategori":x.kategori}));
+$("#tp").onclick=()=>{const wb=XLSX.utils.book_new(),r=[{barcode:"8999999000011",qty:24,satuan:"pcs",kategori:"Minuman",brand:"Aqua"},{barcode:"8999999000028",qty:10,satuan:"box",kategori:"Makanan",brand:"Roma"}].map((x,i)=>({"barcode":x.barcode,"nama barang":["Air Mineral 600ml","Biskuit Coklat"][i],"qty":x.qty,"satuan":x.satuan,"kategori":x.kategori,"brand":x.brand}));
 XLSX.utils.book_append_sheet(wb,sheet(r),"Template");out("template-stok-opname.xlsx",new Uint8Array(XLSX.write(wb,{bookType:"xlsx",type:"array"})))};
 arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats();renderList(true);toast("Hasil hitung direset")});
 arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();cur=null;flush();stats();renderList(true);showCur();toast("Semua data dihapus")});
 load();stats();
-  $("#man").placeholder="Cari nama barang / scan / ketik barcode";
-function autoCode(){let n=0;try{n=+localStorage.getItem("nbc")||0}catch(e){}let c;do{n++;c="NB"+String(n).padStart(4,"0")}while(idx.has(c));try{localStorage.setItem("nbc",n)}catch(e){}return c}
-function pilih(i){cur=i;$("#man").value="";$("#sg").innerHTML="";showCur()}
-function sugg(){const v=$("#man").value.trim(),q=v.toLowerCase(),s=$("#sg");if(!q){s.innerHTML="";return}let h="",n=0;
-for(const i of items){if((i.n+" "+i.b+" "+i.k).toLowerCase().includes(q)){h+='<div class="it" data-b="'+esc(i.b)+'"><div><div class="t">'+esc(i.n)+'</div><div class="m">'+esc(i.b)+' · '+(esc(i.k)||"-")+'</div></div><div><div>'+(i.f??"-")+' / '+i.q+' '+esc(i.s)+'</div></div></div>';if(++n>=8)break}}
-h+='<button class="b s" id="sa" style="margin-top:8px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
-$("#man").oninput=sugg;
-$("#sg").onclick=e=>{const r=e.target.closest(".it");if(r){pilih(idx.get(r.dataset.b));return}
-if(e.target.closest("#sa")){const t=$("#man").value.trim();$("#man").value="";$("#sg").innerHTML="";showNew(autoCode());const nn=$("#nn");if(nn){nn.value=t;$("#nq").focus()}}};
-$("#man").onkeydown=e=>{if(e.key!=="Enter")return;const v=e.target.value.trim();if(!v)return;
-if(idx.has(v)){e.target.value="";$("#sg").innerHTML="";onCode(v);return}
-const m=items.filter(i=>(i.n+" "+i.b+" "+i.k).toLowerCase().includes(v.toLowerCase()));
-if(m.length===1)pilih(m[0]);else toast(m.length?"Pilih dari daftar di bawah":"Tidak ada. Tap + Tambah barang baru")};
-  if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
