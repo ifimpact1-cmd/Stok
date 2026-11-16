@@ -19,7 +19,7 @@ input,select{width:100%;padding:11px;border:1px solid var(--bd);border-radius:10
 .b{padding:12px;border:0;border-radius:10px;background:var(--pri);color:var(--pt);font-weight:600;width:100%}
 .b.s{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}.b.d{background:var(--bad);color:#fff}
 .r{display:flex;gap:8px;margin-top:8px}.r>*{flex:1}
-video{width:100%;max-height:190px;border-radius:10px;background:#000;object-fit:cover;display:none}#reader{width:100%}
+video{width:100%;height:120px;border-radius:10px;background:#000;object-fit:cover;display:none}#reader{width:100%}video.qr{width:230px;height:230px;margin:0 auto}
 .big{display:flex;align-items:center;gap:8px;margin:10px 0}.big button{width:58px;height:58px;font-size:26px;border-radius:12px;border:1px solid var(--bd);background:var(--bg)}.big input{text-align:center;font-size:26px;font-weight:700;height:58px}
 .m{color:var(--mut);font-size:13px}.nm{font-size:17px;font-weight:700}
 .it{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}.it>div:first-child{min-width:0}.it .t{font-weight:600;overflow:hidden;text-overflow:ellipsis}.it>div:last-child{text-align:right;white-space:nowrap}
@@ -136,6 +136,7 @@ h5=new Html5Qrcode("reader");await h5.start({facingMode:"environment"},{fps:8,qr
 $("#cam").textContent="Tutup Kamera"}catch(e){stopCam();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}}
 function stopCam(){clearInterval(tm);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("#v").style.display="none";if(h5){h5.stop().catch(()=>{});h5=null}$("#cam").textContent="Buka Kamera"}
 $("#cam").onclick=startCam;
+  $("#v").onclick=()=>{$("#v").classList.toggle("qr");toast($("#v").classList.contains("qr")?"Mode QR (kotak)":"Mode barcode (lebar)")};
 function renderList(reset){if(reset)lim=50;const q=$("#q").value.toLowerCase().trim(),f=$("#f").value;let n=0,h="",more=false;
 for(const i of items){if(f==="n"&&i.f!=null)continue;if(f==="d"&&(i.f==null||i.f===i.q))continue;if(f==="o"&&(i.f==null||i.f!==i.q))continue;
 if(q&&!hay(i).includes(q))continue;
