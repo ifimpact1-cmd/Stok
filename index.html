@@ -166,4 +166,51 @@ arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats(
 arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();flush();stats();renderList(true);toast("Semua data dihapus")});
 load();stats();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  var camBusy=false,trk=null,lastRead="",readN=0;
+async function startCam(){
+if(stream||h5||camBusy)return stopCam();
+camBusy=true;
+try{
+if("BarcodeDetector"in window){
+let fm=null;
+try{const sf=await BarcodeDetector.getSupportedFormats();fm=["code_128","ean_13","ean_8","upc_a","upc_e","code_39","code_93","itf","codabar","qr_code","data_matrix"].filter(x=>sf.includes(x))}catch(e){}
+det=new BarcodeDetector(fm&&fm.length?{formats:fm}:undefined);
+stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
+const v=$("#v");v.srcObject=stream;v.style.display="block";await v.play();
+trk=stream.getVideoTracks()[0];
+const cap=trk.getCapabilities?trk.getCapabilities():{};
+if(cap.focusMode&&cap.focusMode.includes("continuous"))await trk.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(()=>{});
+const z0=cap.zoom?Math.min(cap.zoom.max,Math.max(cap.zoom.min,1.5)):1;
+let h='';
+if(cap.zoom)h+='<span class="m" style="flex:0 0 auto">Zoom</span><input id="zr" type="range" min="'+cap.zoom.min+'" max="'+cap.zoom.max+'" step="'+(cap.zoom.step||0.1)+'" value="'+z0+'" style="padding:0">';
+if(cap.torch)h+='<button class="b s" id="tz" style="flex:0 0 auto;width:auto;padding:10px 14px">Senter</button>';
+if(h){const bx=document.createElement("div");bx.id="cz";bx.className="r";bx.style.alignItems="center";bx.innerHTML=h;v.insertAdjacentElement("afterend",bx);
+const zr=$("#zr");if(zr){trk.applyConstraints({advanced:[{zoom:z0}]}).catch(()=>{});zr.oninput=()=>trk.applyConstraints({advanced:[{zoom:+zr.value}]}).catch(()=>{})}
+const tz=$("#tz");if(tz){let on=false;tz.onclick=()=>{on=!on;trk.applyConstraints({advanced:[{torch:on}]}).catch(()=>{});tz.textContent=on?"Senter mati":"Senter"}}}
+let miss=0;
+const loop=async()=>{
+if(!stream)return;
+try{
+if(!shOpen()&&v.readyState>=2){
+const r=await det.detect(v);
+if(r.length){miss=0;const k=r.find(x=>idx.has(String(x.rawValue).trim()))||r[0],c=String(k.rawValue).trim();
+if(c===lastRead)readN++;else{lastRead=c;readN=1}
+if(readN>=2){readN=0;onCode(c)}}
+else if(++miss>4){lastRead="";readN=0}
+}
+}catch(e){}
+tm=setTimeout(loop,110);
+};
+loop();
+}else{
+await new Promise((ok,no)=>{if(window.Html5Qrcode)return ok();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+const F=Html5QrcodeSupportedFormats;
+h5=new Html5Qrcode("reader",{formatsToSupport:[F.CODE_128,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_39,F.ITF,F.QR_CODE,F.DATA_MATRIX],verbose:false});
+await h5.start({facingMode:"environment"},{fps:10,qrbox:{width:300,height:150}},c=>onCode(c),()=>{});
+}
+$("#cam").textContent="Tutup Kamera";
+}catch(e){stopCam();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}
+camBusy=false;
+}
+function stopCam(){clearTimeout(tm);tm=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}trk=null;camBusy=false;lastRead="";readN=0;$("#v").style.display="none";const z=$("#cz");if(z)z.remove();if(h5){h5.stop().catch(()=>{});h5=null}$("#cam").textContent="Buka Kamera"}
 </script></body></html>
