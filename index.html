@@ -166,6 +166,104 @@ arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats(
 arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();flush();stats();renderList(true);toast("Semua data dihapus")});
 load();stats();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  /* ===== SCAN BARU: Barcode / QR + tombol silang (X) ===== */
+var scId=0,scTk=0,scT=null,scStream=null,scTrk=null,h5s=null,scDet=null,scLast="",scN=0,scMiss=0,scCv=document.createElement("canvas");
+(function(){const s=document.createElement("style");s.textContent=`
+#ov{position:fixed;inset:0;background:#000;z-index:25;display:none;overflow:hidden}
+#ovv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#ovr{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%)}
+#ovf{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:14px;box-shadow:0 0 0 100vmax rgba(0,0,0,.55);pointer-events:none}
+#ovf.b{width:88vw;height:30vw;max-width:560px;max-height:190px}
+#ovf.q{width:68vw;height:68vw;max-width:340px;max-height:340px}
+#ovf.b::after{content:"";position:absolute;left:10px;right:10px;top:50%;height:2px;background:rgba(255,70,70,.9)}
+#ovx{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:46px;height:46px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:22px;line-height:1}
+#ovtt{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));left:16px;color:#fff;font-weight:700;font-size:17px;text-shadow:0 1px 3px #000}
+#ovc{position:absolute;left:0;right:0;bottom:0;padding:26px 14px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;display:flex;flex-direction:column;gap:10px}
+#ovh{text-align:center;font-size:14px}
+.ovb{padding:11px 14px;border:1px solid rgba(255,255,255,.4);border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font:inherit;font-weight:600}
+.ovrow{display:flex;align-items:center;gap:10px}.ovrow input{flex:1;padding:0;background:none;border:0}
+body.scanning #toast{top:calc(70px + env(safe-area-inset-top,0px))}`;document.head.appendChild(s);
+const c=$("#cam");if(!c)return;c.style.display="none";const v=$("#v");if(v)v.style.display="none";
+const row=document.createElement("div");row.className="r";row.innerHTML='<button class="b" id="sb1">Scan Barcode</button><button class="b" id="sb2">Scan QR</button>';
+c.parentElement.insertAdjacentElement("beforebegin",row);$("#sb1").onclick=()=>openScan("b");$("#sb2").onclick=()=>openScan("q")})();
+function mkOv(){if($("#ov"))return;const d=document.createElement("div");d.id="ov";
+d.innerHTML='<video id="ovv" playsinline muted></video><div id="ovr"></div><div id="ovf"></div><div id="ovtt"></div><button id="ovx" aria-label="Tutup kamera">✕</button><div id="ovc"></div>';
+document.body.appendChild(d);$("#ovx").onclick=()=>closeScan()}
+function modeTxt(){return $("#mode").value==="p"?"Mode: tiap scan +1 (tap untuk ganti)":"Mode: isi jumlah manual (tap untuk ganti)"}
+async function openScan(m){
+if(scTk)return;mkOv();
+const tk=++scId;scTk=tk;const qr=m==="q",o=$("#ov"),v=$("#ovv");
+o.style.display="block";document.body.classList.add("scanning");
+$("#ovf").className=qr?"q":"b";$("#ovf").style.display="";v.style.display="";
+$("#ovtt").textContent=qr?"Scan QR":"Scan Barcode";
+$("#ovc").innerHTML='<div id="ovh">'+(qr?"Arahkan QR ke dalam kotak":"Arahkan barcode melintang ke dalam kotak")+'</div><button class="ovb" id="ovmd">'+modeTxt()+'</button>';
+$("#ovmd").onclick=()=>{const s=$("#mode");s.value=s.value==="p"?"m":"p";s.onchange&&s.onchange();$("#ovmd").textContent=modeTxt()};
+try{history.pushState({sc:1},"")}catch(e){}
+scLast="";scN=0;scMiss=0;
+try{
+if("BarcodeDetector"in window){
+let fm;try{const sf=await BarcodeDetector.getSupportedFormats();const want=qr?["qr_code","data_matrix"]:["code_128","ean_13","ean_8","upc_a","upc_e","code_39","code_93","itf","codabar"];fm=want.filter(x=>sf.includes(x))}catch(e){}
+scDet=new BarcodeDetector(fm&&fm.length?{formats:fm}:undefined);
+const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+if(tk!==scTk){s.getTracks().forEach(t=>t.stop());return}
+scStream=s;v.srcObject=s;await v.play();
+scTrk=s.getVideoTracks()[0];
+const cap=scTrk.getCapabilities?scTrk.getCapabilities():{};
+if(cap.focusMode&&cap.focusMode.includes("continuous"))await scTrk.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(()=>{});
+const z0=cap.zoom?Math.min(cap.zoom.max,Math.max(cap.zoom.min,1.5)):1;
+if(cap.zoom)scTrk.applyConstraints({advanced:[{zoom:z0}]}).catch(()=>{});
+if(cap.zoom||cap.torch){let h='<div class="ovrow">';
+if(cap.zoom)h+='<span>Zoom</span><input id="ovz" type="range" min="'+cap.zoom.min+'" max="'+cap.zoom.max+'" step="'+(cap.zoom.step||0.1)+'" value="'+z0+'">';
+if(cap.torch)h+='<button class="ovb" id="ovtc">Senter</button>';
+$("#ovc").insertAdjacentHTML("beforeend",h+'</div>');
+const z=$("#ovz");if(z)z.oninput=()=>scTrk&&scTrk.applyConstraints({advanced:[{zoom:+z.value}]}).catch(()=>{});
+const tc=$("#ovtc");if(tc){let on=false;tc.onclick=()=>{on=!on;scTrk&&scTrk.applyConstraints({advanced:[{torch:on}]}).catch(()=>{});tc.textContent=on?"Senter mati":"Senter"}}}
+scLoop(tk,qr);
+}else{
+v.style.display="none";$("#ovf").style.display="none";
+await new Promise((ok,no)=>{if(window.Html5Qrcode)return ok();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+if(tk!==scTk)return;
+const F=Html5QrcodeSupportedFormats;
+h5s=new Html5Qrcode("ovr",{formatsToSupport:qr?[F.QR_CODE,F.DATA_MATRIX]:[F.CODE_128,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_39,F.ITF],verbose:false});
+await h5s.start({facingMode:"environment"},{fps:8,qrbox:qr?{width:240,height:240}:{width:300,height:120}},c=>onCode(c),()=>{});
+}
+}catch(e){if(tk===scTk){closeScan();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}}
+}
+async function scLoop(tk,qr){
+if(tk!==scTk)return;
+let d=110;
+try{
+const v=$("#ovv");
+if(shOpen()||document.hidden){if(!v.paused)v.pause();d=200}
+else{
+if(v.paused)v.play().catch(()=>{});
+if(v.readyState>=2&&v.videoWidth>0){
+const o=$("#ov").getBoundingClientRect(),f=$("#ovf").getBoundingClientRect();
+const vw=v.videoWidth,vh=v.videoHeight,s=Math.max(o.width/vw,o.height/vh),ox=(o.width-vw*s)/2,oy=(o.height-vh*s)/2,pw=f.width*.06,ph=f.height*.12;
+let sx=(f.left-o.left-pw-ox)/s,sy=(f.top-o.top-ph-oy)/s,sw=(f.width+2*pw)/s,sh=(f.height+2*ph)/s;
+sx=Math.max(0,sx);sy=Math.max(0,sy);sw=Math.min(vw-sx,sw);sh=Math.min(vh-sy,sh);
+if(sw>10&&sh>10){
+const k=Math.min(1,960/sw),cw=Math.round(sw*k),ch=Math.round(sh*k);
+scCv.width=cw;scCv.height=ch;scCv.getContext("2d").drawImage(v,sx,sy,sw,sh,0,0,cw,ch);
+const r=await scDet.detect(scCv);
+if(tk!==scTk)return;
+if(r.length){scMiss=0;const x=r.find(a=>idx.has(String(a.rawValue).trim()))||r[0],c=String(x.rawValue).trim();
+if(qr)onCode(c);else{if(c===scLast)scN++;else{scLast=c;scN=1}if(scN>=2){scN=0;onCode(c)}}}
+else if(++scMiss>4){scLast="";scN=0}
+}}}
+}catch(e){}
+if(tk===scTk)scT=setTimeout(()=>scLoop(tk,qr),d);
+}
+function closeScan(fp){
+const was=scTk;scTk=0;clearTimeout(scT);
+if(scStream){scStream.getTracks().forEach(t=>t.stop());scStream=null}
+scTrk=null;if(h5s){h5s.stop().catch(()=>{});h5s=null}
+const o=$("#ov");if(o){o.style.display="none";const v=$("#ovv");if(v)v.srcObject=null}
+document.body.classList.remove("scanning");
+if(was&&!fp&&history.state&&history.state.sc)history.back();
+}
+addEventListener("popstate",()=>{if(scTk)closeScan(true)});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&scTk)closeScan()});
   var camBusy=false,trk=null,lastRead="",readN=0;
 async function startCam(){
 if(stream||h5||camBusy)return stopCam();
