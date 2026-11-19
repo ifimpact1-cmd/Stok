@@ -1,44 +1,87 @@
 <!doctype html>
 <html lang="id"><head><meta charset="utf-8"><title>Stok Opname</title>
-<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#e9f8f2">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-:root{--bg:#f4f6f8;--card:#fff;--tx:#12171d;--mut:#667085;--bd:#e1e5ea;--pri:#0f766e;--pt:#fff;--bad:#c0392b;--ok:#15803d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root{--bg:#12161b;--card:#1c222a;--tx:#eef1f4;--mut:#9aa4b0;--bd:#2c343e;--pri:#2dd4bf;--pt:#06201c;--bad:#ff7a6b;--ok:#4ade80;color-scheme:dark}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:30px}
-header{padding:12px 14px 4px}h1{font-size:18px;margin:0}
-.st{display:flex;gap:8px;margin-top:8px}.st div{flex:1;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--mut)}.st b{display:block;font-size:17px;color:var(--tx)}
-nav{position:sticky;top:0;z-index:5;display:flex;background:var(--bg);padding:6px 10px;gap:6px}
-nav button{flex:1;padding:10px 4px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;font-size:14px}
-nav button.on{background:var(--pri);color:var(--pt);border-color:var(--pri);font-weight:600}
-main{padding:6px 12px}section{display:none}section.on{display:block}
-.c{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+:root{--tx:#26304a;--mut:#6b7691;--card:rgba(255,255,255,.93);--bd:#e3e8f5;--in:#f5f7fd;--g1:#a8ead9;--g2:#bcc8ff;--ptx:#123a35;--ok:#1d7a52;--okb:#d9f6e7;--ov:#955700;--ovb:#ffeccc;--lo:#b4233a;--lob:#ffdfe4;--zz:#66718d;--zzb:#eceff8;--dg1:#ffc9bf;--dg2:#ffb8cb;--dtx:#5a1226;--ring:#a5b4fc;--sh:0 2px 10px rgba(79,95,160,.10);--c1:linear-gradient(145deg,#dff7ee,#d3eef7);--c2:linear-gradient(145deg,#e6e4ff,#f3e2f7);--c3:linear-gradient(145deg,#ffeadf,#ffe0e6);--t1:linear-gradient(145deg,#bff2e3,#a9d9f6);--t2:linear-gradient(145deg,#d6d3ff,#f7cdeb);--bg:linear-gradient(160deg,#e9f8f2 0%,#eceffd 52%,#fdeef0 100%);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root{--tx:#e8ecf8;--mut:#a3adc8;--card:rgba(32,38,58,.95);--bd:#303a58;--in:#262d47;--g1:#2f7a6e;--g2:#4d5fb0;--ptx:#f1fffb;--ok:#7be0a8;--okb:#1f4a38;--ov:#ffd28a;--ovb:#4a3a1c;--lo:#ff9fb0;--lob:#5a2631;--zz:#a3adc8;--zzb:#2b3350;--dg1:#8a3a4a;--dg2:#7a3566;--dtx:#fff0f3;--ring:#7c8cf0;--sh:0 2px 10px rgba(0,0,0,.3);--c1:linear-gradient(145deg,#1f3d3b,#1e3550);--c2:linear-gradient(145deg,#2c2c57,#43294f);--c3:linear-gradient(145deg,#443028,#46283a);--t1:linear-gradient(145deg,#2c6b62,#2a5a85);--t2:linear-gradient(145deg,#4a4a9a,#7a3f78);--bg:linear-gradient(160deg,#131a29 0%,#181c33 55%,#231a2b 100%);color-scheme:dark}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#eef3fa}
+body{margin:0;color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:30px}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:var(--bg)}
+header{padding:14px 16px 4px}
+h1{font-size:21px;margin:0 0 10px;font-weight:800;letter-spacing:-.2px}
+.st{display:flex;gap:8px}.st div{flex:1;border-radius:16px;padding:9px 11px;font-size:11px;color:var(--mut);box-shadow:var(--sh)}
+.st b{display:block;font-size:22px;line-height:1.15;color:var(--tx)}
+.s1{background:var(--c1)}.s2{background:var(--c2)}.s3{background:var(--c3)}
+.pg{height:6px;border-radius:4px;background:var(--bd);margin:12px 0 4px;overflow:hidden}
+.pg i{display:block;height:100%;width:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,var(--g1),var(--g2));transition:transform .3s}
+#pt{font-size:12px;color:var(--mut)}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:6px;padding:8px 12px;background:transparent}
+nav button{flex:1;padding:11px 4px;border:1px solid var(--bd);background:var(--card);color:var(--mut);border-radius:14px;font-size:14px;font-weight:600}
+nav button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--ptx);border-color:transparent;font-weight:800;box-shadow:var(--sh)}
+main{padding:4px 14px}section{display:none}section.on{display:block;animation:fi .18s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
 button,input,select{font:inherit;color:var(--tx)}
-input,select{width:100%;padding:11px;border:1px solid var(--bd);border-radius:10px;background:var(--bg)}
-.b{padding:12px;border:0;border-radius:10px;background:var(--pri);color:var(--pt);font-weight:600;width:100%}
-.b.s{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}.b.d{background:var(--bad);color:#fff}
-.r{display:flex;gap:8px;margin-top:8px}.r>*{flex:1}
-video{width:100%;height:120px;border-radius:10px;background:#000;object-fit:cover;display:none}#reader{width:100%}video.qr{width:230px;height:230px;margin:0 auto}
-.big{display:flex;align-items:center;gap:8px;margin:10px 0}.big button{width:58px;height:58px;font-size:26px;border-radius:12px;border:1px solid var(--bd);background:var(--bg)}.big input{text-align:center;font-size:26px;font-weight:700;height:58px}
-.m{color:var(--mut);font-size:13px}.nm{font-size:17px;font-weight:700}
-.it{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}.it>div:first-child{min-width:0}.it .t{font-weight:600;overflow:hidden;text-overflow:ellipsis}.it>div:last-child{text-align:right;white-space:nowrap}
-.pos{color:var(--ok)}.neg{color:var(--bad)}.zr{color:var(--mut)}
-#sh{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:30}#sh.on{display:flex}
-#shc{background:var(--card);width:100%;border-radius:18px 18px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto}
-#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:20px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:40;max-width:92%;text-align:center}#toast.on{opacity:1}
+input,select{width:100%;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--in)}
+input:focus,select:focus{outline:2px solid var(--ring);outline-offset:0}
+input[type=file]{padding:10px}
+.b{padding:13px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--ptx);font-weight:700;width:100%;box-shadow:0 2px 8px rgba(110,130,200,.22);transition:transform .09s}
+.b:active,.tile:active{transform:scale(.97)}
+.b.s{background:var(--in);color:var(--tx);border:1px solid var(--bd);box-shadow:none}
+.b.d{background:linear-gradient(135deg,var(--dg1),var(--dg2));color:var(--dtx)}
+.r{display:flex;gap:8px;margin-top:10px}.r>*{flex:1}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:104px;border:0;border-radius:20px;font-weight:800;font-size:15px;color:var(--ptx);box-shadow:var(--sh);transition:transform .09s}
+.tile svg{width:34px;height:34px}.t1{background:var(--t1)}.t2{background:var(--t2)}
+.seg{display:flex;gap:3px;padding:3px;background:var(--in);border:1px solid var(--bd);border-radius:15px;margin-top:12px}
+.seg button{flex:1;border:0;background:transparent;padding:10px 6px;border-radius:12px;font-weight:600;color:var(--mut)}
+.seg button.on{background:var(--card);color:var(--tx);box-shadow:var(--sh)}
+.big{display:flex;align-items:center;gap:8px;margin:12px 0}.big button{width:58px;height:58px;font-size:26px;border-radius:16px;border:1px solid var(--bd);background:var(--in)}.big input{text-align:center;font-size:28px;font-weight:800;height:58px}
+.m{color:var(--mut);font-size:13px}.nm{font-size:18px;font-weight:800}
+.it{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}.it>div:first-child{min-width:0}.it .t{font-weight:700;overflow:hidden;text-overflow:ellipsis}.it>div:last-child{text-align:right;white-space:nowrap}
+.chip{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.ok{background:var(--okb);color:var(--ok)}.ov{background:var(--ovb);color:var(--ov)}.lo{background:var(--lob);color:var(--lo)}.zz{background:var(--zzb);color:var(--zz)}
+#ls{margin-top:10px;padding:9px 12px;border-radius:12px;background:var(--okb);color:var(--ok);font-weight:700;font-size:13px}#ls:empty{display:none}
+#sh{position:fixed;inset:0;background:rgba(20,25,45,.45);display:none;align-items:flex-end;z-index:30}#sh.on{display:flex}
+#shc{background:var(--card);background-color:var(--in);width:100%;border-radius:24px 24px 0 0;padding:10px 16px calc(18px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto;animation:up .2s ease-out}
+#shc::before{content:"";display:block;width:42px;height:4px;border-radius:2px;background:var(--bd);margin:0 auto 14px}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+#toast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--tx);color:var(--in);padding:10px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40;max-width:92%;text-align:center}#toast.on{opacity:.96}
+body.scanning #toast{top:calc(70px + env(safe-area-inset-top,0px))}
 h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3px 0}label{font-size:12px;color:var(--mut)}
+#ov{position:fixed;inset:0;background:#000;z-index:25;display:none;overflow:hidden;animation:fi .15s ease}
+#ovv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+#ovr{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%)}
+#ovf{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:18px;box-shadow:0 0 0 100vmax rgba(0,0,0,.55);pointer-events:none}
+#ovf.fb{width:88vw;height:30vw;max-width:560px;max-height:190px}
+#ovf.fq{width:68vw;height:68vw;max-width:340px;max-height:340px}
+#ovf.fb::after{content:"";position:absolute;left:10px;right:10px;top:50%;height:2px;background:rgba(255,90,90,.9)}
+#ovx{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:46px;height:46px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:22px;line-height:1}
+#ovtt{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));left:16px;color:#fff;font-weight:800;font-size:17px;text-shadow:0 1px 3px #000}
+#ovc{position:absolute;left:0;right:0;bottom:0;padding:26px 14px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;display:flex;flex-direction:column;gap:10px}
+#ovh{text-align:center;font-size:14px}
+.ovb{padding:11px 14px;border:1px solid rgba(255,255,255,.4);border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font:inherit;font-weight:600}
+.ovrow{display:flex;align-items:center;gap:10px}.ovrow input{flex:1;padding:0;background:none;border:0}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
 <header><h1>Stok Opname</h1>
-<div class="st"><div>Total barang<b id="s1">0</b></div><div>Sudah dihitung<b id="s2">0</b></div><div>Item selisih<b id="s3">0</b></div></div></header>
+<div class="st"><div class="s1">Total barang<b id="s1">0</b></div><div class="s2">Sudah dihitung<b id="s2">0</b></div><div class="s3">Item selisih<b id="s3">0</b></div></div>
+<div class="pg"><i id="pb"></i></div><div id="pt"></div></header>
 <nav><button data-t="scan" class="on">Scan</button><button data-t="list">Daftar</button><button data-t="data">Data</button></nav>
 <main>
 <section id="scan" class="on">
 <div class="c">
-<video id="v" playsinline muted></video><div id="reader"></div>
-<div class="r"><button class="b" id="cam">Buka Kamera</button><select id="mode"><option value="p">Tiap scan +1</option><option value="m">Isi jumlah manual</option></select></div>
+<div class="tiles">
+<button class="tile t1" id="sb1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h2v14H3zM7 5h1v14H7zM10 5h3v14h-3zM15 5h1v14h-1zM18 5h3v14h-3z"/></svg>Scan Barcode</button>
+<button class="tile t2" id="sb2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 14h2M14 19h2M18 18h3v3h-3z" fill="currentColor"/></svg>Scan QR</button>
+</div>
+<div class="seg" id="seg"><button data-m="p">Tiap scan +1</button><button data-m="m">Isi jumlah</button></div>
+<select id="mode" hidden><option value="p">Tiap scan +1</option><option value="m">Isi jumlah manual</option></select>
 <div class="r"><input id="man" placeholder="Cari nama barang / scan / ketik barcode" autocomplete="off"></div>
 <div id="sg"></div>
+<div id="ls"></div>
 </div>
 </section>
 <section id="list">
@@ -50,9 +93,11 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 <div class="c"><h3>Impor Excel / CSV</h3><div class="m">Kolom: barcode, nama barang, qty, satuan, kategori, brand (opsional: qty fisik). Format kolom barcode sebagai Teks.</div>
 <div class="r"><select id="imode"><option value="g">Gabung (update)</option><option value="r">Ganti semua data</option></select></div>
 <div class="r"><input type="file" id="file" accept=".xlsx,.xls,.csv"></div></div>
-<div class="c"><h3>Ekspor</h3><div class="r"><button class="b" id="ex">Excel (.xlsx)</button><button class="b s" id="ec">CSV</button></div>
+<div class="c"><h3>Ekspor</h3><div class="r" style="margin-top:0"><button class="b" id="ex">Excel (.xlsx)</button><button class="b s" id="ec">CSV</button></div>
 <div class="r"><button class="b s" id="tp">Unduh template contoh</button></div></div>
-<div class="c"><h3>Reset</h3><div class="r"><button class="b s" id="rs">Reset hasil hitung</button><button class="b d" id="del">Hapus semua</button></div></div>
+<div class="c"><h3>Reset dan pemulihan</h3><div class="r" style="margin-top:0"><button class="b s" id="rs">Reset hasil hitung</button><button class="b d" id="del">Hapus semua</button></div>
+<div class="r"><button class="b s" id="rb">Pulihkan data sebelum aksi terakhir</button></div>
+<div class="m" style="margin-top:8px">Cadangan otomatis dibuat sebelum impor, reset, atau hapus semua.</div></div>
 <div class="c"><h3>Kegunaan stok opname</h3><ul>
 <li>Mencocokkan stok sistem dengan stok fisik di gudang.</li>
 <li>Menemukan barang hilang, rusak, salah catat, atau berlebih.</li>
@@ -61,42 +106,49 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 <div class="m" style="margin-top:8px">Selisih = qty fisik - qty sistem. Data tersimpan di HP ini, jadi ekspor berkala sebagai cadangan.</div></div>
 </section>
 </main>
+<div id="ov"><video id="ovv" playsinline muted></video><div id="ovr"></div><div id="ovf"></div><div id="ovtt"></div><button id="ovx" aria-label="Tutup kamera">✕</button><div id="ovc"></div></div>
 <div id="sh"><div id="shc"></div></div><div id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-const $=s=>document.querySelector(s),KEY="stokopname_v1";
-let items=[],idx=new Map(),cur=null,stream=null,det=null,tm=null,h5=null,last="",lt=0,lim=50,sv=null,ac=null;
+const $=s=>document.querySelector(s),KEY="stokopname_v1",BAK="stokopname_bak";
+let items=[],idx=new Map(),cur=null,last="",lt=0,lim=50,sv=null,ac=null;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sub=i=>(esc(i.k)||"-")+(i.r?" · "+esc(i.r):"");
 const hay=i=>(i.n+" "+i.b+" "+(i.k||"")+" "+(i.r||"")).toLowerCase();
-const dt=d=>`<span class="${d?(d>0?"pos":"neg"):"zr"}">${d?"Selisih "+(d>0?"+":"")+d:"Sesuai"}</span>`;
-function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove("on"),2200)}
-function load(){try{items=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){items=[]}idx=new Map(items.map(i=>[i.b,i]))}
+const dt=d=>d===0?'<span class="chip ok">Sesuai</span>':d>0?'<span class="chip ov">Lebih +'+d+'</span>':'<span class="chip lo">Kurang '+d+'</span>';
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove("on"),2200);
+if(String(t).startsWith("✓")){const l=$("#ls");if(l)l.textContent=t+" · tersimpan"}}
+function load(){let raw=null;try{raw=localStorage.getItem(KEY);items=raw?JSON.parse(raw):[];if(!Array.isArray(items))throw 0}catch(e){items=[];try{if(raw)localStorage.setItem("stokopname_corrupt",raw)}catch(_){}}idx=new Map(items.map(i=>[i.b,i]))}
 function save(){clearTimeout(sv);sv=setTimeout(flush,400)}
 function flush(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){toast("Penyimpanan penuh, ekspor data!")}}
+function backup(){try{localStorage.setItem(BAK,JSON.stringify(items))}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(document.hidden)flush()});
-function stats(){$("#s1").textContent=items.length;let c=0,d=0;for(const i of items){if(i.f!=null){c++;if(i.f!==i.q)d++}}$("#s2").textContent=c;$("#s3").textContent=d}
+function stats(){$("#s1").textContent=items.length;let c=0,d=0;for(const i of items){if(i.f!=null){c++;if(i.f!==i.q)d++}}$("#s2").textContent=c;$("#s3").textContent=d;
+$("#pb").style.transform="scaleX("+(items.length?c/items.length:0)+")";$("#pt").textContent=items.length?Math.round(c/items.length*100)+"% selesai dihitung":""}
 function beep(){try{navigator.vibrate&&navigator.vibrate(40);ac=ac||new AudioContext();const o=ac.createOscillator();o.connect(ac.destination);o.frequency.value=880;o.start();o.stop(ac.currentTime+.08)}catch(e){}}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,section").forEach(e=>e.classList.remove("on"));b.classList.add("on");$("#"+b.dataset.t).classList.add("on");if(b.dataset.t==="list")renderList(true)});
-try{$("#mode").value=localStorage.getItem("mode")||"p"}catch(e){}
-$("#mode").onchange=()=>{try{localStorage.setItem("mode",$("#mode").value)}catch(e){}};
+const syncSeg=()=>document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===$("#mode").value));
+try{$("#mode").value=localStorage.getItem("mode")||"p"}catch(e){}syncSeg();
+$("#mode").onchange=()=>{try{localStorage.setItem("mode",$("#mode").value)}catch(e){}syncSeg()};
+document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{$("#mode").value=b.dataset.m;$("#mode").onchange()});
 function shOpen(){return $("#sh").classList.contains("on")}
-function closeSh(){$("#sh").classList.remove("on");$("#shc").innerHTML="";cur=null;lt=Date.now();if($("#list").classList.contains("on"))renderList()}
+function closeSh(){$("#sh").classList.remove("on");$("#shc").innerHTML="";cur=null;lt=Date.now();if($("#list").classList.contains("on"))renderList();
+if(matchMedia("(pointer:fine)").matches&&!scTk)setTimeout(()=>{const m=$("#man");if(m&&$("#scan").classList.contains("on"))m.focus()},80)}
 $("#sh").onclick=e=>{if(e.target.id==="sh")closeSh()};
 function onCode(code,force){code=String(code).trim();if(!code||shOpen())return;const now=Date.now();
 if(!force&&code===last&&now-lt<4000){lt=now;return}
 last=code;lt=now;const it=idx.get(code);beep();
 if(it){if($("#mode").value==="p"){it.f=(it.f||0)+1;save();stats();toast("✓ "+it.n+" → "+it.f)}else{cur=it;showCur()}}else showNew(code)}
-function diffHtml(i){return i.f==null?'<span class="zr">belum dihitung</span>':dt(i.f-i.q)}
+function diffHtml(i){return i.f==null?'<span class="chip zz">Belum dihitung</span>':dt(i.f-i.q)}
 function showCur(){const i=cur;if(!i)return closeSh();
 $("#shc").innerHTML=`<div class="nm">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${sub(i)}</div>
 <div class="m" style="margin-top:6px">Stok sistem: <b>${i.q}</b> ${esc(i.s)}${i.f==null?"":" · Tersimpan: <b>"+i.f+"</b>"}</div>
 <div class="big"><button id="mn">−</button><input id="fq" type="number" inputmode="numeric" value="${i.f??""}" placeholder="0"><button id="pl">+</button></div>
-<div id="df" class="m" style="text-align:center"></div>
+<div id="df" style="text-align:center;min-height:26px"></div>
 <div class="r"><button class="b s" id="bc">Batal</button><button class="b" id="bs">Simpan</button></div>
-<button class="b s" id="rm" style="margin-top:8px;color:var(--bad)">Hapus barang ini</button>`;
+<button class="b s" id="rm" style="margin-top:8px;color:var(--lo)">Hapus barang ini</button>`;
 $("#sh").classList.add("on");
-const f=$("#fq"),upd=()=>{$("#df").innerHTML=f.value===""?"&nbsp;":dt(+f.value-i.q)};upd();
+const f=$("#fq"),upd=()=>{$("#df").innerHTML=f.value===""?"":dt(+f.value-i.q)};upd();
 $("#mn").onclick=()=>{f.value=Math.max(0,(+f.value||0)-1);upd()};$("#pl").onclick=()=>{f.value=(+f.value||0)+1;upd()};
 f.oninput=upd;f.onkeydown=e=>{if(e.key==="Enter")$("#bs").click()};
 $("#bc").onclick=closeSh;
@@ -106,7 +158,7 @@ setTimeout(()=>{f.focus();f.select()},60)}
 const uniq=f=>[...new Set(items.map(i=>i[f]).filter(Boolean))].sort().slice(0,300).map(v=>'<option value="'+esc(v)+'">').join("");
 function autoCode(){let n=0;try{n=+localStorage.getItem("nbc")||0}catch(e){}let c;do{n++;c="NB"+String(n).padStart(4,"0")}while(idx.has(c));try{localStorage.setItem("nbc",n)}catch(e){}return c}
 function showNew(code,name){cur=null;$("#shc").innerHTML=`<div class="nm">Barang baru</div><div class="m">Kode: ${esc(code)}</div>
-<div style="margin-top:8px"><label>Nama barang</label><input id="nn" value="${esc(name||"")}"></div>
+<div style="margin-top:10px"><label>Nama barang</label><input id="nn" value="${esc(name||"")}"></div>
 <div class="r"><div><label>Qty fisik</label><input id="nq" type="number" inputmode="numeric" value="1"></div><div><label>Satuan</label><input id="ns" value="pcs"></div></div>
 <div class="r"><div><label>Kategori</label><input id="nk" list="dk" autocomplete="off"><datalist id="dk">${uniq("k")}</datalist></div><div><label>Brand</label><input id="nr" list="dr" autocomplete="off"><datalist id="dr">${uniq("r")}</datalist></div></div>
 <div class="r"><button class="b s" id="nc">Batal</button><button class="b" id="na">Tambah</button></div>`;
@@ -117,7 +169,7 @@ function arm(b,txt,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);b.da
 function pilih(i){cur=i;$("#man").value="";$("#sg").innerHTML="";showCur()}
 function sugg(){const v=$("#man").value.trim(),q=v.toLowerCase(),s=$("#sg");if(!q){s.innerHTML="";return}let h="",n=0;
 for(const i of items){if(hay(i).includes(q)){h+='<div class="it" data-b="'+esc(i.b)+'"><div><div class="t">'+esc(i.n)+'</div><div class="m">'+esc(i.b)+' · '+sub(i)+'</div></div><div><div>'+(i.f??"-")+' / '+i.q+' '+esc(i.s)+'</div></div></div>';if(++n>=8)break}}
-h+='<button class="b s" id="sa" style="margin-top:8px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
+h+='<button class="b s" id="sa" style="margin-top:10px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
 $("#man").oninput=sugg;
 $("#sg").onclick=e=>{const r=e.target.closest(".it");if(r){pilih(idx.get(r.dataset.b));return}
 if(e.target.closest("#sa")){const t=$("#man").value.trim();$("#man").value="";$("#sg").innerHTML="";showNew(autoCode(),t)}};
@@ -125,191 +177,5 @@ $("#man").onkeydown=e=>{if(e.key!=="Enter")return;const v=e.target.value.trim();
 if(idx.has(v)){e.target.value="";$("#sg").innerHTML="";onCode(v,true);return}
 const m=items.filter(i=>hay(i).includes(v.toLowerCase()));
 if(m.length===1)pilih(m[0]);else toast(m.length?"Pilih dari daftar di bawah":"Tidak ada. Tap + Tambah barang baru")};
-async function startCam(){
-if(stream||h5)return stopCam();
-try{if("BarcodeDetector"in window)det=new BarcodeDetector();}catch(e){det=null}
-try{
-if(det){stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment",width:{ideal:1280}}});const v=$("#v");v.srcObject=stream;v.style.display="block";await v.play();
-tm=setInterval(async()=>{try{const r=await det.detect(v);if(r.length)onCode(r[0].rawValue)}catch(e){}},250)}
-else{await new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
-h5=new Html5Qrcode("reader");await h5.start({facingMode:"environment"},{fps:8,qrbox:{width:250,height:150}},c=>onCode(c),()=>{})}
-$("#cam").textContent="Tutup Kamera"}catch(e){stopCam();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}}
-function stopCam(){clearInterval(tm);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}$("#v").style.display="none";if(h5){h5.stop().catch(()=>{});h5=null}$("#cam").textContent="Buka Kamera"}
-$("#cam").onclick=startCam;
-  $("#v").onclick=()=>{$("#v").classList.toggle("qr");toast($("#v").classList.contains("qr")?"Mode QR (kotak)":"Mode barcode (lebar)")};
-function renderList(reset){if(reset)lim=50;const q=$("#q").value.toLowerCase().trim(),f=$("#f").value;let n=0,h="",more=false;
-for(const i of items){if(f==="n"&&i.f!=null)continue;if(f==="d"&&(i.f==null||i.f===i.q))continue;if(f==="o"&&(i.f==null||i.f!==i.q))continue;
-if(q&&!hay(i).includes(q))continue;
-if(n>=lim){more=true;break}n++;
-h+=`<div class="it" data-b="${esc(i.b)}"><div><div class="t">${esc(i.n)}</div><div class="m">${esc(i.b)} · ${sub(i)}</div></div><div><div>${i.f??"-"} / ${i.q} ${esc(i.s)}</div><div class="m">${diffHtml(i)}</div></div></div>`}
-$("#rows").innerHTML=h||'<div class="m">Tidak ada data. Impor file di tab Data.</div>';$("#more").style.display=more?"block":"none"}
-$("#q").oninput=()=>renderList(true);$("#f").onchange=()=>renderList(true);$("#more").onclick=()=>{lim+=100;renderList()};
-$("#rows").onclick=e=>{const r=e.target.closest(".it");if(!r)return;cur=idx.get(r.dataset.b);showCur()};
-const N=s=>String(s).toLowerCase().replace(/[^a-z0-9]/g,""),
-K={b:["barcode","kode","kodebarang","sku","kodebarcode"],n:["namabarang","nama","barang","produk","item"],q:["qty","stok","stock","jumlah","qtysistem"],s:["satuan","unit","uom"],k:["kategori","category","grup"],r:["brand","merk","merek"],f:["qtyfisik","fisik","hasilhitung","counted"]};
-function pick(row,key){for(const c in row){if(K[key].includes(N(c)))return row[c]}return ""}
-$("#file").onchange=async e=>{const fl=e.target.files[0];if(!fl)return;
-try{const wb=XLSX.read(await fl.arrayBuffer(),{type:"array",raw:true}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});
-const rep=$("#imode").value==="r";if(rep){items=[];idx=new Map()}let add=0,upd=0;
-for(const r of rows){const b=String(pick(r,"b")).trim();if(!b)continue;const fv=pick(r,"f"),o={b,n:String(pick(r,"n")).trim()||b,q:+pick(r,"q")||0,s:String(pick(r,"s")).trim(),k:String(pick(r,"k")).trim(),r:String(pick(r,"r")).trim(),f:fv===""?null:+fv||0},x=idx.get(b);
-if(x){Object.assign(x,{n:o.n,q:o.q,s:o.s,k:o.k});if(o.r)x.r=o.r;if(o.f!=null)x.f=o.f;upd++}else{items.push(o);idx.set(b,o);add++}}
-flush();stats();renderList(true);toast(`Impor selesai: ${add} baru, ${upd} diupdate`)}catch(err){toast("File tidak bisa dibaca")}e.target.value=""};
-function out(name,data){try{const b=new Blob([data],{type:"application/octet-stream"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast("Mengunduh "+name)}catch(e){toast("Gagal menyimpan")}}
-function sheet(rows){return XLSX.utils.json_to_sheet(rows,{header:["barcode","nama barang","qty","satuan","kategori","brand","qty fisik","selisih"]})}
-function exRows(){return items.map(i=>({"barcode":i.b,"nama barang":i.n,"qty":i.q,"satuan":i.s,"kategori":i.k,"brand":i.r||"","qty fisik":i.f==null?"":i.f,"selisih":i.f==null?"":i.f-i.q}))}
-const stamp=()=>new Date().toISOString().slice(0,10);
-$("#ex").onclick=()=>{if(!items.length)return toast("Belum ada data");const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,sheet(exRows()),"Stok Opname");out(`stok-opname-${stamp()}.xlsx`,new Uint8Array(XLSX.write(wb,{bookType:"xlsx",type:"array"})))};
-$("#ec").onclick=()=>{if(!items.length)return toast("Belum ada data");out(`stok-opname-${stamp()}.csv`,"\ufeff"+XLSX.utils.sheet_to_csv(sheet(exRows())))};
-$("#tp").onclick=()=>{const wb=XLSX.utils.book_new(),r=[{barcode:"8999999000011",qty:24,satuan:"pcs",kategori:"Minuman",brand:"Aqua"},{barcode:"8999999000028",qty:10,satuan:"box",kategori:"Makanan",brand:"Roma"}].map((x,i)=>({"barcode":x.barcode,"nama barang":["Air Mineral 600ml","Biskuit Coklat"][i],"qty":x.qty,"satuan":x.satuan,"kategori":x.kategori,"brand":x.brand}));
-XLSX.utils.book_append_sheet(wb,sheet(r),"Template");out("template-stok-opname.xlsx",new Uint8Array(XLSX.write(wb,{bookType:"xlsx",type:"array"})))};
-arm($("#rs"),"Reset hasil hitung",()=>{items.forEach(i=>i.f=null);flush();stats();renderList(true);toast("Hasil hitung direset")});
-arm($("#del"),"Hapus semua",()=>{items=[];idx=new Map();flush();stats();renderList(true);toast("Semua data dihapus")});
-load();stats();
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
-  /* ===== SCAN BARU: Barcode / QR + tombol silang (X) ===== */
-var scId=0,scTk=0,scT=null,scStream=null,scTrk=null,h5s=null,scDet=null,scLast="",scN=0,scMiss=0,scCv=document.createElement("canvas");
-(function(){const s=document.createElement("style");s.textContent=`
-#ov{position:fixed;inset:0;background:#000;z-index:25;display:none;overflow:hidden}
-#ovv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#ovr{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%)}
-#ovf{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:14px;box-shadow:0 0 0 100vmax rgba(0,0,0,.55);pointer-events:none}
-#ovf.b{width:88vw;height:30vw;max-width:560px;max-height:190px}
-#ovf.q{width:68vw;height:68vw;max-width:340px;max-height:340px}
-#ovf.b::after{content:"";position:absolute;left:10px;right:10px;top:50%;height:2px;background:rgba(255,70,70,.9)}
-#ovx{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:46px;height:46px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:22px;line-height:1}
-#ovtt{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));left:16px;color:#fff;font-weight:700;font-size:17px;text-shadow:0 1px 3px #000}
-#ovc{position:absolute;left:0;right:0;bottom:0;padding:26px 14px calc(14px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,rgba(0,0,0,.8));color:#fff;display:flex;flex-direction:column;gap:10px}
-#ovh{text-align:center;font-size:14px}
-.ovb{padding:11px 14px;border:1px solid rgba(255,255,255,.4);border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font:inherit;font-weight:600}
-.ovrow{display:flex;align-items:center;gap:10px}.ovrow input{flex:1;padding:0;background:none;border:0}
-body.scanning #toast{top:calc(70px + env(safe-area-inset-top,0px))}`;document.head.appendChild(s);
-const c=$("#cam");if(!c)return;c.style.display="none";const v=$("#v");if(v)v.style.display="none";
-const row=document.createElement("div");row.className="r";row.innerHTML='<button class="b" id="sb1">Scan Barcode</button><button class="b" id="sb2">Scan QR</button>';
-c.parentElement.insertAdjacentElement("beforebegin",row);$("#sb1").onclick=()=>openScan("b");$("#sb2").onclick=()=>openScan("q")})();
-function mkOv(){if($("#ov"))return;const d=document.createElement("div");d.id="ov";
-d.innerHTML='<video id="ovv" playsinline muted></video><div id="ovr"></div><div id="ovf"></div><div id="ovtt"></div><button id="ovx" aria-label="Tutup kamera">✕</button><div id="ovc"></div>';
-document.body.appendChild(d);$("#ovx").onclick=()=>closeScan()}
-function modeTxt(){return $("#mode").value==="p"?"Mode: tiap scan +1 (tap untuk ganti)":"Mode: isi jumlah manual (tap untuk ganti)"}
-async function openScan(m){
-if(scTk)return;mkOv();
-const tk=++scId;scTk=tk;const qr=m==="q",o=$("#ov"),v=$("#ovv");
-o.style.display="block";document.body.classList.add("scanning");
-$("#ovf").className=qr?"q":"b";$("#ovf").style.display="";v.style.display="";
-$("#ovtt").textContent=qr?"Scan QR":"Scan Barcode";
-$("#ovc").innerHTML='<div id="ovh">'+(qr?"Arahkan QR ke dalam kotak":"Arahkan barcode melintang ke dalam kotak")+'</div><button class="ovb" id="ovmd">'+modeTxt()+'</button>';
-$("#ovmd").onclick=()=>{const s=$("#mode");s.value=s.value==="p"?"m":"p";s.onchange&&s.onchange();$("#ovmd").textContent=modeTxt()};
-try{history.pushState({sc:1},"")}catch(e){}
-scLast="";scN=0;scMiss=0;
-try{
-if("BarcodeDetector"in window){
-let fm;try{const sf=await BarcodeDetector.getSupportedFormats();const want=qr?["qr_code","data_matrix"]:["code_128","ean_13","ean_8","upc_a","upc_e","code_39","code_93","itf","codabar"];fm=want.filter(x=>sf.includes(x))}catch(e){}
-scDet=new BarcodeDetector(fm&&fm.length?{formats:fm}:undefined);
-const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
-if(tk!==scTk){s.getTracks().forEach(t=>t.stop());return}
-scStream=s;v.srcObject=s;await v.play();
-scTrk=s.getVideoTracks()[0];
-const cap=scTrk.getCapabilities?scTrk.getCapabilities():{};
-if(cap.focusMode&&cap.focusMode.includes("continuous"))await scTrk.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(()=>{});
-const z0=cap.zoom?Math.min(cap.zoom.max,Math.max(cap.zoom.min,1.5)):1;
-if(cap.zoom)scTrk.applyConstraints({advanced:[{zoom:z0}]}).catch(()=>{});
-if(cap.zoom||cap.torch){let h='<div class="ovrow">';
-if(cap.zoom)h+='<span>Zoom</span><input id="ovz" type="range" min="'+cap.zoom.min+'" max="'+cap.zoom.max+'" step="'+(cap.zoom.step||0.1)+'" value="'+z0+'">';
-if(cap.torch)h+='<button class="ovb" id="ovtc">Senter</button>';
-$("#ovc").insertAdjacentHTML("beforeend",h+'</div>');
-const z=$("#ovz");if(z)z.oninput=()=>scTrk&&scTrk.applyConstraints({advanced:[{zoom:+z.value}]}).catch(()=>{});
-const tc=$("#ovtc");if(tc){let on=false;tc.onclick=()=>{on=!on;scTrk&&scTrk.applyConstraints({advanced:[{torch:on}]}).catch(()=>{});tc.textContent=on?"Senter mati":"Senter"}}}
-scLoop(tk,qr);
-}else{
-v.style.display="none";$("#ovf").style.display="none";
-await new Promise((ok,no)=>{if(window.Html5Qrcode)return ok();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
-if(tk!==scTk)return;
-const F=Html5QrcodeSupportedFormats;
-h5s=new Html5Qrcode("ovr",{formatsToSupport:qr?[F.QR_CODE,F.DATA_MATRIX]:[F.CODE_128,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_39,F.ITF],verbose:false});
-await h5s.start({facingMode:"environment"},{fps:8,qrbox:qr?{width:240,height:240}:{width:300,height:120}},c=>onCode(c),()=>{});
-}
-}catch(e){if(tk===scTk){closeScan();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}}
-}
-async function scLoop(tk,qr){
-if(tk!==scTk)return;
-let d=110;
-try{
-const v=$("#ovv");
-if(shOpen()||document.hidden){if(!v.paused)v.pause();d=200}
-else{
-if(v.paused)v.play().catch(()=>{});
-if(v.readyState>=2&&v.videoWidth>0){
-const o=$("#ov").getBoundingClientRect(),f=$("#ovf").getBoundingClientRect();
-const vw=v.videoWidth,vh=v.videoHeight,s=Math.max(o.width/vw,o.height/vh),ox=(o.width-vw*s)/2,oy=(o.height-vh*s)/2,pw=f.width*.06,ph=f.height*.12;
-let sx=(f.left-o.left-pw-ox)/s,sy=(f.top-o.top-ph-oy)/s,sw=(f.width+2*pw)/s,sh=(f.height+2*ph)/s;
-sx=Math.max(0,sx);sy=Math.max(0,sy);sw=Math.min(vw-sx,sw);sh=Math.min(vh-sy,sh);
-if(sw>10&&sh>10){
-const k=Math.min(1,960/sw),cw=Math.round(sw*k),ch=Math.round(sh*k);
-scCv.width=cw;scCv.height=ch;scCv.getContext("2d").drawImage(v,sx,sy,sw,sh,0,0,cw,ch);
-const r=await scDet.detect(scCv);
-if(tk!==scTk)return;
-if(r.length){scMiss=0;const x=r.find(a=>idx.has(String(a.rawValue).trim()))||r[0],c=String(x.rawValue).trim();
-if(qr)onCode(c);else{if(c===scLast)scN++;else{scLast=c;scN=1}if(scN>=2){scN=0;onCode(c)}}}
-else if(++scMiss>4){scLast="";scN=0}
-}}}
-}catch(e){}
-if(tk===scTk)scT=setTimeout(()=>scLoop(tk,qr),d);
-}
-function closeScan(fp){
-const was=scTk;scTk=0;clearTimeout(scT);
-if(scStream){scStream.getTracks().forEach(t=>t.stop());scStream=null}
-scTrk=null;if(h5s){h5s.stop().catch(()=>{});h5s=null}
-const o=$("#ov");if(o){o.style.display="none";const v=$("#ovv");if(v)v.srcObject=null}
-document.body.classList.remove("scanning");
-if(was&&!fp&&history.state&&history.state.sc)history.back();
-}
-addEventListener("popstate",()=>{if(scTk)closeScan(true)});
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&scTk)closeScan()});
-  (function(){const s=document.createElement("style");s.textContent="#ovv{display:block!important;max-height:none!important;border-radius:0!important}#ovf{background:transparent!important;padding:0!important}";document.head.appendChild(s)})();
-  var camBusy=false,trk=null,lastRead="",readN=0;
-async function startCam(){
-if(stream||h5||camBusy)return stopCam();
-camBusy=true;
-try{
-if("BarcodeDetector"in window){
-let fm=null;
-try{const sf=await BarcodeDetector.getSupportedFormats();fm=["code_128","ean_13","ean_8","upc_a","upc_e","code_39","code_93","itf","codabar","qr_code","data_matrix"].filter(x=>sf.includes(x))}catch(e){}
-det=new BarcodeDetector(fm&&fm.length?{formats:fm}:undefined);
-stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}},audio:false});
-const v=$("#v");v.srcObject=stream;v.style.display="block";await v.play();
-trk=stream.getVideoTracks()[0];
-const cap=trk.getCapabilities?trk.getCapabilities():{};
-if(cap.focusMode&&cap.focusMode.includes("continuous"))await trk.applyConstraints({advanced:[{focusMode:"continuous"}]}).catch(()=>{});
-const z0=cap.zoom?Math.min(cap.zoom.max,Math.max(cap.zoom.min,1.5)):1;
-let h='';
-if(cap.zoom)h+='<span class="m" style="flex:0 0 auto">Zoom</span><input id="zr" type="range" min="'+cap.zoom.min+'" max="'+cap.zoom.max+'" step="'+(cap.zoom.step||0.1)+'" value="'+z0+'" style="padding:0">';
-if(cap.torch)h+='<button class="b s" id="tz" style="flex:0 0 auto;width:auto;padding:10px 14px">Senter</button>';
-if(h){const bx=document.createElement("div");bx.id="cz";bx.className="r";bx.style.alignItems="center";bx.innerHTML=h;v.insertAdjacentElement("afterend",bx);
-const zr=$("#zr");if(zr){trk.applyConstraints({advanced:[{zoom:z0}]}).catch(()=>{});zr.oninput=()=>trk.applyConstraints({advanced:[{zoom:+zr.value}]}).catch(()=>{})}
-const tz=$("#tz");if(tz){let on=false;tz.onclick=()=>{on=!on;trk.applyConstraints({advanced:[{torch:on}]}).catch(()=>{});tz.textContent=on?"Senter mati":"Senter"}}}
-let miss=0;
-const loop=async()=>{
-if(!stream)return;
-try{
-if(!shOpen()&&v.readyState>=2){
-const r=await det.detect(v);
-if(r.length){miss=0;const k=r.find(x=>idx.has(String(x.rawValue).trim()))||r[0],c=String(k.rawValue).trim();
-if(c===lastRead)readN++;else{lastRead=c;readN=1}
-if(readN>=2){readN=0;onCode(c)}}
-else if(++miss>4){lastRead="";readN=0}
-}
-}catch(e){}
-tm=setTimeout(loop,110);
-};
-loop();
-}else{
-await new Promise((ok,no)=>{if(window.Html5Qrcode)return ok();const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js";s.onload=ok;s.onerror=no;document.head.appendChild(s)});
-const F=Html5QrcodeSupportedFormats;
-h5=new Html5Qrcode("reader",{formatsToSupport:[F.CODE_128,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_39,F.ITF,F.QR_CODE,F.DATA_MATRIX],verbose:false});
-await h5.start({facingMode:"environment"},{fps:10,qrbox:{width:300,height:150}},c=>onCode(c),()=>{});
-}
-$("#cam").textContent="Tutup Kamera";
-}catch(e){stopCam();toast("Kamera tidak bisa dibuka. Pakai kolom ketik/scanner.")}
-camBusy=false;
-}
-function stopCam(){clearTimeout(tm);tm=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}trk=null;camBusy=false;lastRead="";readN=0;$("#v").style.display="none";const z=$("#cz");if(z)z.remove();if(h5){h5.stop().catch(()=>{});h5=null}$("#cam").textContent="Buka Kamera"}
-</script></body></html>
+/* ===== Scan kamera: Barcode / QR, layar penuh, tombol silang ===== */
+let scId=0,scTk=0,scT=null,scStream=null,scTrk=null,h5s=null,
