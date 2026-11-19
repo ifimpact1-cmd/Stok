@@ -37,7 +37,7 @@ input[type=file]{padding:10px}
 .tile svg{width:34px;height:34px}.t1{background:var(--t1)}.t2{background:var(--t2)}
 .seg{display:flex;gap:3px;padding:3px;background:var(--in);border:1px solid var(--bd);border-radius:15px;margin-top:12px}
 .seg button{flex:1;border:0;background:transparent;padding:10px 6px;border-radius:12px;font-weight:600;color:var(--mut)}
-.seg button.on{background:var(--card);color:var(--tx);box-shadow:var(--sh)}
+.seg button.on{background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--ptx);font-weight:800;box-shadow:var(--sh)}
 .big{display:flex;align-items:center;gap:8px;margin:12px 0}.big button{width:58px;height:58px;font-size:26px;border-radius:16px;border:1px solid var(--bd);background:var(--in)}.big input{text-align:center;font-size:28px;font-weight:800;height:58px}
 .m{color:var(--mut);font-size:13px}.nm{font-size:18px;font-weight:800}
 .it{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--bd)}.it:last-child{border:0}.it>div:first-child{min-width:0}.it .t{font-weight:700;overflow:hidden;text-overflow:ellipsis}.it>div:last-child{text-align:right;white-space:nowrap}
@@ -64,14 +64,18 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 #ovh{text-align:center;font-size:14px}
 .ovb{padding:11px 14px;border:1px solid rgba(255,255,255,.4);border-radius:14px;background:rgba(255,255,255,.14);color:#fff;font:inherit;font-weight:600}
 .ovrow{display:flex;align-items:center;gap:10px}.ovrow input{flex:1;padding:0;background:none;border:0}
+.ver{font-size:11px;font-weight:600;color:var(--mut);margin-left:6px}
+#err{position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;background:#b4233a;color:#fff;padding:10px 12px;border-radius:12px;font-size:12px;display:none;word-break:break-word}
+#bn{margin-bottom:12px;padding:10px 12px;border-radius:14px;background:var(--ovb);color:var(--ov);font-weight:600;font-size:13px;display:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
-<header><h1>Stok Opname</h1>
+<header><h1>Stok Opname<span class="ver">v10</span></h1>
 <div class="st"><div class="s1">Total barang<b id="s1">0</b></div><div class="s2">Sudah dihitung<b id="s2">0</b></div><div class="s3">Item selisih<b id="s3">0</b></div></div>
 <div class="pg"><i id="pb"></i></div><div id="pt"></div></header>
 <nav><button data-t="scan" class="on">Scan</button><button data-t="list">Daftar</button><button data-t="data">Data</button></nav>
 <main>
 <section id="scan" class="on">
+<div id="bn"></div>
 <div class="c">
 <div class="tiles">
 <button class="tile t1" id="sb1"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5h2v14H3zM7 5h1v14H7zM10 5h3v14h-3zM15 5h1v14h-1zM18 5h3v14h-3z"/></svg>Scan Barcode</button>
@@ -107,28 +111,37 @@ h3{margin:0 0 6px;font-size:15px}ul{margin:4px 0 0;padding-left:18px}li{margin:3
 </section>
 </main>
 <div id="ov"><video id="ovv" playsinline muted></video><div id="ovr"></div><div id="ovf"></div><div id="ovtt"></div><button id="ovx" aria-label="Tutup kamera">✕</button><div id="ovc"></div></div>
-<div id="sh"><div id="shc"></div></div><div id="toast"></div>
+<div id="sh"><div id="shc"></div></div><div id="toast"></div><div id="err"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),KEY="stokopname_v1",BAK="stokopname_bak";
-let items=[],idx=new Map(),cur=null,last="",lt=0,lim=50,sv=null,ac=null;
+function showErr(m){const e=$("#err");if(!e)return;e.style.display="block";e.textContent="Error: "+m+" (tap untuk tutup, kirim screenshot ke developer)"}
+addEventListener("error",e=>showErr((e.message||"")+(e.lineno?" @baris "+e.lineno:"")));
+addEventListener("unhandledrejection",e=>{const m=String(e.reason&&e.reason.message||e.reason);if(!/Abort|NotAllowed|interrupted/i.test(m))showErr(m)});
+$("#err").onclick=()=>{$("#err").style.display="none"};
+let items=[],idx=new Map(),cur=null,last="",lt=0,lim=50,sv=null,ac=null,loaded=false;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sub=i=>(esc(i.k)||"-")+(i.r?" · "+esc(i.r):"");
 const hay=i=>(i.n+" "+i.b+" "+(i.k||"")+" "+(i.r||"")).toLowerCase();
 const dt=d=>d===0?'<span class="chip ok">Sesuai</span>':d>0?'<span class="chip ov">Lebih +'+d+'</span>':'<span class="chip lo">Kurang '+d+'</span>';
 function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.x);toast.x=setTimeout(()=>e.classList.remove("on"),2200);
 if(String(t).startsWith("✓")){const l=$("#ls");if(l)l.textContent=t+" · tersimpan"}}
-function load(){let raw=null;try{raw=localStorage.getItem(KEY);items=raw?JSON.parse(raw):[];if(!Array.isArray(items))throw 0}catch(e){items=[];try{if(raw)localStorage.setItem("stokopname_corrupt",raw)}catch(_){}}idx=new Map(items.map(i=>[i.b,i]))}
+function load(){let raw=null;try{raw=localStorage.getItem(KEY);items=raw?JSON.parse(raw):[];if(!Array.isArray(items))throw 0}catch(e){items=[];try{if(raw)localStorage.setItem("stokopname_corrupt",raw)}catch(_){}}idx=new Map(items.map(i=>[i.b,i]));loaded=true}
 function save(){clearTimeout(sv);sv=setTimeout(flush,400)}
-function flush(){try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){toast("Penyimpanan penuh, ekspor data!")}}
+function flush(){if(!loaded)return;try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){toast("Penyimpanan penuh, ekspor data!")}}
 function backup(){try{localStorage.setItem(BAK,JSON.stringify(items))}catch(e){}}
+load();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}
 document.addEventListener("visibilitychange",()=>{if(document.hidden)flush()});
 function stats(){$("#s1").textContent=items.length;let c=0,d=0;for(const i of items){if(i.f!=null){c++;if(i.f!==i.q)d++}}$("#s2").textContent=c;$("#s3").textContent=d;
-$("#pb").style.transform="scaleX("+(items.length?c/items.length:0)+")";$("#pt").textContent=items.length?Math.round(c/items.length*100)+"% selesai dihitung":""}
+$("#pb").style.transform="scaleX("+(items.length?c/items.length:0)+")";$("#pt").textContent=items.length?Math.round(c/items.length*100)+"% selesai dihitung":"";banner(c)}
+function banner(c){const b=$("#bn");let le=0;try{le=+localStorage.getItem("lastExp")||0}catch(e){}const h=(Date.now()-le)/36e5;
+if(c>0&&(!le||h>12)){b.style.display="block";b.textContent="Belum ekspor cadangan"+(le?" sejak "+Math.floor(h)+" jam lalu":"")+". Tap untuk ke menu Data."}else b.style.display="none"}
+$("#bn").onclick=()=>document.querySelector("nav [data-t=data]").click();
 function beep(){try{navigator.vibrate&&navigator.vibrate(40);ac=ac||new AudioContext();const o=ac.createOscillator();o.connect(ac.destination);o.frequency.value=880;o.start();o.stop(ac.currentTime+.08)}catch(e){}}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button,section").forEach(e=>e.classList.remove("on"));b.classList.add("on");$("#"+b.dataset.t).classList.add("on");if(b.dataset.t==="list")renderList(true)});
 const syncSeg=()=>document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.m===$("#mode").value));
-try{$("#mode").value=localStorage.getItem("mode")||"p"}catch(e){}syncSeg();
+let mv=null;try{mv=localStorage.getItem("mode")}catch(e){}$("#mode").value=mv==="m"?"m":"p";syncSeg();
 $("#mode").onchange=()=>{try{localStorage.setItem("mode",$("#mode").value)}catch(e){}syncSeg()};
 document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{$("#mode").value=b.dataset.m;$("#mode").onchange()});
 function shOpen(){return $("#sh").classList.contains("on")}
@@ -164,18 +177,4 @@ function showNew(code,name){cur=null;$("#shc").innerHTML=`<div class="nm">Barang
 <div class="r"><button class="b s" id="nc">Batal</button><button class="b" id="na">Tambah</button></div>`;
 $("#sh").classList.add("on");$("#nc").onclick=closeSh;
 $("#na").onclick=()=>{const n=$("#nn").value.trim();if(!n)return toast("Isi nama barang");const i={b:code,n,q:0,s:$("#ns").value.trim(),k:$("#nk").value.trim(),r:$("#nr").value.trim(),f:Math.max(0,+$("#nq").value||0)};items.push(i);idx.set(code,i);save();stats();closeSh();toast("✓ Ditambahkan: "+n)};
-setTimeout(()=>{const e=$(name?"#nq":"#nn");e&&e.focus()},60)}
-function arm(b,txt,fn){let t;b.onclick=()=>{if(b.dataset.a){clearTimeout(t);b.dataset.a="";b.textContent=txt;fn()}else{b.dataset.a="1";b.textContent="Yakin? Tap lagi";t=setTimeout(()=>{b.dataset.a="";b.textContent=txt},3000)}}}
-function pilih(i){cur=i;$("#man").value="";$("#sg").innerHTML="";showCur()}
-function sugg(){const v=$("#man").value.trim(),q=v.toLowerCase(),s=$("#sg");if(!q){s.innerHTML="";return}let h="",n=0;
-for(const i of items){if(hay(i).includes(q)){h+='<div class="it" data-b="'+esc(i.b)+'"><div><div class="t">'+esc(i.n)+'</div><div class="m">'+esc(i.b)+' · '+sub(i)+'</div></div><div><div>'+(i.f??"-")+' / '+i.q+' '+esc(i.s)+'</div></div></div>';if(++n>=8)break}}
-h+='<button class="b s" id="sa" style="margin-top:10px">+ Tambah barang baru: '+esc(v)+'</button>';s.innerHTML=h}
-$("#man").oninput=sugg;
-$("#sg").onclick=e=>{const r=e.target.closest(".it");if(r){pilih(idx.get(r.dataset.b));return}
-if(e.target.closest("#sa")){const t=$("#man").value.trim();$("#man").value="";$("#sg").innerHTML="";showNew(autoCode(),t)}};
-$("#man").onkeydown=e=>{if(e.key!=="Enter")return;const v=e.target.value.trim();if(!v)return;
-if(idx.has(v)){e.target.value="";$("#sg").innerHTML="";onCode(v,true);return}
-const m=items.filter(i=>hay(i).includes(v.toLowerCase()));
-if(m.length===1)pilih(m[0]);else toast(m.length?"Pilih dari daftar di bawah":"Tidak ada. Tap + Tambah barang baru")};
-/* ===== Scan kamera: Barcode / QR, layar penuh, tombol silang ===== */
-let scId=0,scTk=0,scT=null,scStream=null,scTrk=null,h5s=null,
+setTimeout
